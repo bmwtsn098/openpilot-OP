@@ -80,6 +80,7 @@ class CAR:
   CIVIC_BOSCH_DIESEL = "HONDA CIVIC SEDAN 1.6 DIESEL 2019"
   CIVIC_2022 = "HONDA CIVIC 2022"
   ACURA_ILX = "ACURA ILX 2016"
+  ACURA_INTEGRA = "ACURA INTEGRA 2023"
   CRV = "HONDA CR-V 2016"
   CRV_5G = "HONDA CR-V 2017"
   CRV_EU = "HONDA CR-V EU 2016"
@@ -132,6 +133,7 @@ CAR_INFO: Dict[str, Optional[Union[HondaCarInfo, List[HondaCarInfo]]]] = {
     HondaCarInfo("Honda Civic Hatchback 2022", "All", video_link="https://youtu.be/ytiOT5lcp6Q"),
   ],
   CAR.ACURA_ILX: HondaCarInfo("Acura ILX 2016-19", "AcuraWatch Plus", min_steer_speed=25. * CV.MPH_TO_MS),
+  CAR.ACURA_INTEGRA: HondaCarInfo("Acura Integra 2023", "All"),
   CAR.CRV: HondaCarInfo("Honda CR-V 2015-16", "Touring Trim", min_steer_speed=12. * CV.MPH_TO_MS),
   CAR.CRV_5G: HondaCarInfo("Honda CR-V 2017-22", min_steer_speed=12. * CV.MPH_TO_MS),
   CAR.CRV_EU: None,  # HondaCarInfo("Honda CR-V EU", "Touring"),  # Euro version of CRV Touring
@@ -1472,6 +1474,47 @@ FW_VERSIONS = {
       b'78109-TV9-A510\x00\x00',
     ],
   },
+  CAR.ACURA_INTEGRA:{
+    (Ecu.eps, 0x18DA30F1, None): [
+      b'39990-T38-A040\x00\x00',
+      b'\x0c BK2E092337E                  ',
+    ],
+    (Ecu.gateway, 0x18DAEFF1, None): [
+      b'38897-3S5-A110\x00\x00',
+      b'\x0bM1962104335\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.srs, 0x18DA53F1, None): [
+      b'77959-3S5-A920\x00\x00',
+      b'\x0bC2VP00VGF20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.combinationMeter, 0x18DA60F1, None): [
+      b'78108-3S5-A220\x00\x00',
+      b'\x18P0551337\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.fwdRadar, 0x18dab0f1, None): [
+      b'\x18EB12497FFFF0123034000072\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.vsa, 0x18DA28F1, None): [
+      b'57114-3S5-CB30\x00\x00',
+      b'\x0b30550517473\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.transmission, 0x18da1ef1, None): [
+      b'28101-6LP-A010\x00\x00',
+      b'\x0b00032191127\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.programmedFuelInjection, 0x18da10f1, None): [
+      b'37805-6LM-A520\x00\x00',
+      b'\x0bL4732120394\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.electricBrakeBooster, 0x18da2bf1, None): [
+      b'39494-T20-A010\x00\x00',
+      b'\x08P0320288\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.hud, 0x18da61f1, None): [
+      b'78209-3S5-A030\x00\x00',
+      b'\x18P0412423\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+  },
   CAR.HONDA_E:{
     (Ecu.eps, 0x18DA30F1, None):[
       b'39990-TYF-N030\x00\x00'
@@ -1560,6 +1603,7 @@ DBC = {
   CAR.ACCORD: dbc_dict('honda_accord_2018_can_generated', None),
   CAR.ACCORDH: dbc_dict('honda_accord_2018_can_generated', None),
   CAR.ACURA_ILX: dbc_dict('acura_ilx_2016_can_generated', 'acura_ilx_2016_nidec'),
+  CAR.ACURA_INTEGRA: dbc_dict('honda_civic_ex_2022_can_generated', None),
   CAR.ACURA_RDX: dbc_dict('acura_rdx_2018_can_generated', 'acura_ilx_2016_nidec'),
   CAR.ACURA_RDX_3G: dbc_dict('acura_rdx_2020_can_generated', None),
   CAR.CIVIC: dbc_dict('honda_civic_touring_2016_can_generated', 'acura_ilx_2016_nidec'),
@@ -1592,6 +1636,6 @@ HONDA_NIDEC_ALT_PCM_ACCEL = {CAR.ODYSSEY}
 HONDA_NIDEC_ALT_SCM_MESSAGES = {CAR.ACURA_ILX, CAR.ACURA_RDX, CAR.CRV, CAR.CRV_EU, CAR.FIT, CAR.FREED, CAR.HRV, CAR.ODYSSEY_CHN,
                                 CAR.PILOT, CAR.RIDGELINE}
 HONDA_BOSCH = {CAR.ACCORD, CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CRV_5G,
-               CAR.CRV_HYBRID, CAR.INSIGHT, CAR.ACURA_RDX_3G, CAR.HONDA_E, CAR.CIVIC_2022, CAR.HRV_3G}
+               CAR.CRV_HYBRID, CAR.INSIGHT, CAR.ACURA_RDX_3G, CAR.HONDA_E, CAR.CIVIC_2022, CAR.HRV_3G, CAR.ACURA_INTEGRA}
 HONDA_BOSCH_ALT_BRAKE_SIGNAL = {CAR.ACCORD, CAR.CRV_5G, CAR.ACURA_RDX_3G, CAR.HRV_3G}
-HONDA_BOSCH_RADARLESS = {CAR.CIVIC_2022, CAR.HRV_3G}
+HONDA_BOSCH_RADARLESS = {CAR.CIVIC_2022, CAR.HRV_3G, CAR.ACURA_INTEGRA}

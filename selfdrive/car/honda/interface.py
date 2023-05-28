@@ -137,6 +137,15 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.72
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.8], [0.24]]
 
+    elif candidate == CAR.ACURA_INTEGRA:
+      ret.mass = 3150 * CV.LB_TO_KG + STD_CARGO_KG
+      ret.wheelbase = CivicParams.WHEELBASE
+      ret.centerToFront = CivicParams.CENTER_TO_FRONT
+      ret.steerRatio = 15.38  # 10.93 is end-to-end spec
+      ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0, 4096], [0, 4096]]  # TODO: determine if there is a dead zone at the top end
+      tire_stiffness_factor = 1.
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.8], [0.24]]
+
     elif candidate in (CAR.CRV, CAR.CRV_EU):
       ret.mass = 3572. * CV.LB_TO_KG + STD_CARGO_KG
       ret.wheelbase = 2.62
@@ -288,6 +297,9 @@ class CarInterface(CarInterfaceBase):
 
     if candidate in HONDA_BOSCH_RADARLESS:
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_HONDA_RADARLESS
+
+    if candidate in (CAR.ACURA_INTEGRA):
+      ret.safetyConfigs[0].safetyParam |= Panda.FLAG_HONDA_RADARLESS_INTEGRA
 
     # min speed to enable ACC. if car can do stop and go, then set enabling speed
     # to a negative value, so it won't matter. Otherwise, add 0.5 mph margin to not

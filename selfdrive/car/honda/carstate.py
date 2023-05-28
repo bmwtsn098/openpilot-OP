@@ -14,7 +14,7 @@ TransmissionType = car.CarParams.TransmissionType
 
 def get_can_signals(CP, gearbox_msg, main_on_sig_msg):
   signals = [
-    ("XMISSION_SPEED", "ENGINE_DATA"),
+    ("CAR_SPEED", "CAR_SPEED"),
     ("WHEEL_SPEED_FL", "WHEEL_SPEEDS"),
     ("WHEEL_SPEED_FR", "WHEEL_SPEEDS"),
     ("WHEEL_SPEED_RL", "WHEEL_SPEEDS"),
@@ -45,7 +45,6 @@ def get_can_signals(CP, gearbox_msg, main_on_sig_msg):
   ]
 
   checks = [
-    ("ENGINE_DATA", 100),
     ("WHEEL_SPEEDS", 50),
     ("STEERING_SENSORS", 100),
     ("SEATBELT_STATUS", 10),
@@ -56,6 +55,10 @@ def get_can_signals(CP, gearbox_msg, main_on_sig_msg):
     ("STEER_STATUS", 100),
     ("STEER_MOTOR_TORQUE", 0),  # TODO: not on every car
   ]
+
+  if CP.carFingerprint not in (CAR.ACURA_INTEGRA):
+    signals.append(("XMISSION_SPEED", "ENGINE_DATA"))
+    checks.append(("ENGINE_DATA", 100))
 
   if CP.carFingerprint == CAR.ODYSSEY_CHN:
     checks += [
@@ -103,7 +106,7 @@ def get_can_signals(CP, gearbox_msg, main_on_sig_msg):
     else:
       checks.append(("CRUISE_PARAMS", 50))
 
-  if CP.carFingerprint in (CAR.ACCORD, CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CRV_HYBRID, CAR.INSIGHT, CAR.ACURA_RDX_3G, CAR.HONDA_E, CAR.CIVIC_2022, CAR.HRV_3G):
+  if CP.carFingerprint in (CAR.ACCORD, CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CRV_HYBRID, CAR.INSIGHT, CAR.ACURA_RDX_3G, CAR.HONDA_E, CAR.CIVIC_2022, CAR.HRV_3G, CAR.ACURA_INTEGRA):
     signals.append(("DRIVERS_DOOR_OPEN", "SCM_FEEDBACK"))
   elif CP.carFingerprint in (CAR.ODYSSEY_CHN, CAR.FREED, CAR.HRV):
     signals.append(("DRIVERS_DOOR_OPEN", "SCM_BUTTONS"))
@@ -173,12 +176,16 @@ class CarState(CarStateBase):
     # used for car hud message
     self.is_metric = not cp.vl["CAR_SPEED"]["IMPERIAL_UNIT"]
 
+    if self.CP.carFingerprint in (CAR.ACURA_INTEGRA):
+      vehicle_speed = cp.vl["CAR_SPEED"]["CAR_SPEED"]
+    else:
+      vehicle_speed = cp.vl["ENGINE_DATA"]["XMISSION_SPEED"]
     # ******************* parse out can *******************
     # STANDSTILL->WHEELS_MOVING bit can be noisy around zero, so use XMISSION_SPEED
     # panda checks if the signal is non-zero
-    ret.standstill = cp.vl["ENGINE_DATA"]["XMISSION_SPEED"] < 1e-5
+    ret.standstill =  vehicle_speed < 1e-5
     # TODO: find a common signal across all cars
-    if self.CP.carFingerprint in (CAR.ACCORD, CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CRV_HYBRID, CAR.INSIGHT, CAR.ACURA_RDX_3G, CAR.HONDA_E, CAR.CIVIC_2022, CAR.HRV_3G):
+    if self.CP.carFingerprint in (CAR.ACCORD, CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CRV_HYBRID, CAR.INSIGHT, CAR.ACURA_RDX_3G, CAR.HONDA_E, CAR.CIVIC_2022, CAR.HRV_3G, CAR.ACURA_INTEGRA):
       ret.doorOpen = bool(cp.vl["SCM_FEEDBACK"]["DRIVERS_DOOR_OPEN"])
     elif self.CP.carFingerprint in (CAR.ODYSSEY_CHN, CAR.FREED, CAR.HRV):
       ret.doorOpen = bool(cp.vl["SCM_BUTTONS"]["DRIVERS_DOOR_OPEN"])
@@ -217,7 +224,7 @@ class CarState(CarStateBase):
 
     # blend in transmission speed at low speed, since it has more low speed accuracy
     v_weight = interp(v_wheel, v_weight_bp, v_weight_v)
-    ret.vEgoRaw = (1. - v_weight) * cp.vl["ENGINE_DATA"]["XMISSION_SPEED"] * CV.KPH_TO_MS * self.CP.wheelSpeedFactor + v_weight * v_wheel
+    ret.vEgoRaw = (1. - v_weight) * vehicle_speed * CV.KPH_TO_MS * self.CP.wheelSpeedFactor + v_weight * v_wheel
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
 
     self.dash_speed_seen = self.dash_speed_seen or cp.vl["CAR_SPEED"]["ROUGH_CAR_SPEED_2"] > 1e-3
