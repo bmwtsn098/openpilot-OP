@@ -106,7 +106,7 @@ class CarInterface(CarInterfaceBase):
         ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0, 2560], [0, 2560]]
         ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[1.1], [0.33]]
 
-    elif candidate in (CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CIVIC_2022):
+    elif candidate in (CAR.CIVIC_BOSCH, CAR.CIVIC_BOSCH_DIESEL, CAR.CIVIC_2022, CAR.ACURA_INTEGRA):
       ret.mass = 1326.
       ret.wheelbase = 2.70
       ret.centerToFront = ret.wheelbase * 0.4
@@ -287,6 +287,9 @@ class CarInterface(CarInterfaceBase):
 
     if candidate in HONDA_BOSCH_RADARLESS:
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_HONDA_RADARLESS
+
+    if candidate in (CAR.ACURA_INTEGRA):
+      ret.safetyConfigs[0].safetyParam |= Panda.FLAG_HONDA_RADARLESS_INTEGRA
 
     # min speed to enable ACC. if car can do stop and go, then set enabling speed
     # to a negative value, so it won't matter. Otherwise, add 0.5 mph margin to not
